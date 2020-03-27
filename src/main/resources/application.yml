@@ -2,8 +2,6 @@ spring:
   output:
     ansi:
       enabled: ALWAYS
-  redis:
-    host: redis
 
 logging:
   pattern.console: "%clr(%d{yy-MM-dd E HH:mm:ss.SSS}){blue} %clr(%-5p) %clr(${PID}){faint} %clr(---){faint} %clr([%8.20t]){cyan} %clr(%logger{0}){blue} %clr(:){red} %clr(%m){faint}%n"

@@ -11,7 +11,7 @@
 	<groupId>bhhoffmann.experimenting.webflux</groupId>
 	<artifactId>threads</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>threads</name>
+	<name>webflux-threads</name>
 	<description>Demo project for Spring Boot with Webflux</description>
 
 	<properties>

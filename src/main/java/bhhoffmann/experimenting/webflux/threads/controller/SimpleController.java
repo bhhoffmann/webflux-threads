@@ -17,13 +17,14 @@ public class SimpleController {
     @GetMapping("/thread")
     public Mono<ResponseEntity<String>> thread() {
 
-        logger.info("GET on /thread");
-
-        System.out.println(Thread.currentThread().getName());
+        logger.info("Received a GET request on endpoint /thread");
 
         return Mono.just("Hello from ThreadsApplication")
-                .doOnNext(msg -> logger.info("Returning msg: {}", msg))
-                .map(msg -> new ResponseEntity<>(msg, HttpStatus.OK));
+                .doOnNext(msg -> logger.info("Controller doing its work on thread: {}", Thread.currentThread().getName()))
+                .map(msg -> {
+                    logger.info("Returning the message: {}", msg);
+                    return new ResponseEntity<>(msg, HttpStatus.OK);
+                });
 
     }
 

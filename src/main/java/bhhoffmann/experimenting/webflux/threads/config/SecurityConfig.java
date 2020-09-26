@@ -1,5 +1,6 @@
 package bhhoffmann.experimenting.webflux.threads.config;
 
+/*
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -35,7 +36,7 @@ public class SecurityConfig {
 
     
     //Adding the code below makes the controller run on boundedElastic threads. Why?!
-    /*
+
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
 
@@ -46,6 +47,8 @@ public class SecurityConfig {
         return http.build();
     }
 
-    */
+
 
 }
+
+ */

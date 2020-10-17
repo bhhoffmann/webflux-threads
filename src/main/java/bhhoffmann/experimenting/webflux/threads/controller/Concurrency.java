@@ -1,7 +1,10 @@
 package bhhoffmann.experimenting.webflux.threads.controller;
 
+import bhhoffmann.experimenting.webflux.threads.processing.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.data.redis.core.ReactiveValueOperations;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,13 +26,62 @@ public class Concurrency {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final WebClient webClient;
+    private ReactiveValueOperations<String, String> redis;
+
     private final Random rand = new Random();
 
     public Concurrency(
+            ReactiveRedisTemplate<String, String> redis,
             WebClient.Builder builder
     ) {
+        this.redis = redis.opsForValue();
         this.webClient = builder
                 .build();
+    }
+
+    @GetMapping("/process/prime")
+    public Mono<String> prime() {
+        logger.info(" \n Request to /process/prime");
+
+        return Mono.just("Request to calculate prime")
+                .doOnNext(msg -> logger.info("{}", msg))
+                .publishOn(Schedulers.single())
+                .flatMap(ignore -> Processor.rLargestPrime(30000))
+                .doOnNext(p -> logger.info("RETURNING"))
+                .map(p -> "OK");
+                //.subscribe(result -> logger.info("sub result: {}", result));
+        //return Mono.just("OK").doOnNext(it -> logger.info("controller returns: {}", it));
+    }
+
+    @GetMapping("/process/primeS")
+    public Mono<String> primeS() {
+        logger.info(" \n Request to /process/prime");
+
+        Mono.just("Staring prime calculation")
+                .doOnNext(msg -> logger.info("{}", msg))
+                .flatMap(ignore -> Processor.rLargestPrime(10000))
+                .doOnNext(p -> logger.info("prime: {}", p))
+                .map(p -> "OK").log()
+                .subscribe(result -> logger.info("sub result: {}", result));
+
+        return Mono.just("OK").doOnNext(it -> logger.info("controller returns: {}", it));
+    }
+
+    @GetMapping("/redis/nio")
+    public Mono<String> nio() {
+        logger.info(" \n Request to /redis/nio");
+
+        Mono.just("Reading value from REDIS")
+                .doOnNext(msg -> logger.info("{}", msg))
+                .then(redis.get("T"))
+                .switchIfEmpty(redis.set("T", "NIO").thenReturn("Set a value"))
+                .onErrorResume(err -> {
+                    logger.info("Got an error: {}", err.getMessage());
+                    return Mono.just("Recovered");
+                }).subscribe(result -> logger.info("sub result: {}", result));
+
+        return Mono.just("OK")
+                .doOnNext(it -> logger.info("controller returns: {}", it));
     }
 
     @GetMapping("/webclient")

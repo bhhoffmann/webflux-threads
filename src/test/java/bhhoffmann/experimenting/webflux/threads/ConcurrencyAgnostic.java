@@ -67,10 +67,11 @@ public class ConcurrencyAgnostic {
         CountDownLatch latch = new CountDownLatch(1);
 
         logger.info("Setting up sequence.");
-        Flux<Integer> f = Flux.range(1, 5)
-                .map(nr -> nr*10000)
+        Flux<String> f = Flux.range(1, 5)
+                //.map(nr -> nr*10000)
                 //.map(this::largestPrime)
-                .doOnNext(squared -> logger.info("Prime: {}", squared));
+                .flatMap(nr -> mockNonBlockingCall())
+                .doOnNext(result -> logger.info("result: {}", result));
 
         logger.info("Subscribing");
         f.subscribe(result -> latch.countDown());
@@ -84,6 +85,10 @@ public class ConcurrencyAgnostic {
             logger.info("latch.await() interrupted. Exception message: {}", e.getMessage());
         }
         logger.info("Stopping");
+    }
+
+    private Mono<String> mockNonBlockingCall() {
+        return Mono.just("data");
     }
 
     @Test

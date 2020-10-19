@@ -21,7 +21,7 @@ import java.util.Random;
 import java.util.stream.BaseStream;
 
 @RestController
-public class Concurrency {
+public class ConcurrencyAPI {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -30,7 +30,7 @@ public class Concurrency {
 
     private final Random rand = new Random();
 
-    public Concurrency(
+    public ConcurrencyAPI(
             ReactiveRedisTemplate<String, String> redis,
             WebClient.Builder builder
     ) {
